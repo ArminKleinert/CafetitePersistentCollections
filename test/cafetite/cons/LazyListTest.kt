@@ -19,22 +19,28 @@ class LazyListTest {
     @Suppress("NOTHING_TO_INLINE")
     private inline fun <T> plOf(vararg xs: T) = PersistentList.of(*xs)
 
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun <T> from(coll: Sequence<T>) = LazyList.from(coll)
+
     @Test
     fun testConstructor() {
         Assertions.assertEquals(of<Int>(), from(listOf<Int>()))
         Assertions.assertEquals(from<Int>(arrayOf()), from(listOf<Int>()))
         Assertions.assertEquals(from(listOf<Int>().asIterable()), from(listOf<Int>()))
         Assertions.assertEquals(from(of<Int>()), from(listOf<Int>()))
+        Assertions.assertEquals(from(sequenceOf<Int>()), from(listOf<Int>()))
 
         Assertions.assertEquals(of(1), from(listOf(1)))
         Assertions.assertEquals(from(arrayOf(1)), from(listOf(1)))
         Assertions.assertEquals(from(listOf(1).asIterable()), from(listOf(1)))
         Assertions.assertEquals(from(of(1)), from(listOf(1)))
+        Assertions.assertEquals(from(sequenceOf(1)), from(listOf(1)))
 
         Assertions.assertEquals(of(1, 2, 3, 4, 5), from(listOf(1, 2, 3, 4, 5)))
         Assertions.assertEquals(from(arrayOf(1, 2, 3, 4, 5)), from(listOf(1, 2, 3, 4, 5)))
         Assertions.assertEquals(from(listOf(1, 2, 3, 4, 5).asIterable()), from(listOf(1, 2, 3, 4, 5)))
         Assertions.assertEquals(from(of(1, 2, 3, 4, 5)), from(listOf(1, 2, 3, 4, 5)))
+        Assertions.assertEquals(from(sequenceOf(1, 2, 3, 4, 5)), from(listOf(1, 2, 3, 4, 5)))
     }
 
     @Test
@@ -59,12 +65,20 @@ class LazyListTest {
         Assertions.assertEquals(plOf(1, 2, 3), from(arrayOf(1, 2, 3)))
         Assertions.assertEquals(plOf<Int>(), from(arrayOf<Int>()))
         Assertions.assertEquals(plOf(1, 2, 3), from(arrayOf(1, 2, 3)))
+
+        Assertions.assertEquals(plOf<Int>(), from(sequenceOf<Int>()))
+        Assertions.assertEquals(plOf(1, 2, 3), from(sequenceOf(1, 2, 3)))
+        Assertions.assertEquals(plOf<Int>(), from(sequenceOf<Int>()))
+        Assertions.assertEquals(plOf(1, 2, 3), from(sequenceOf(1, 2, 3)))
     }
 
     @Test
     fun testToString() {
         Assertions.assertEquals("[]", of<Int>().toString())
         Assertions.assertEquals("[1, 2, 3]", of(1, 2, 3).toString())
+        Assertions.assertEquals("[1, 2, 3, 4]", of(1, 2, 3, 4).toString(limit = 4))
+        Assertions.assertEquals("[1, 2, 3, ...]", of(1, 2, 3, 4).toString(limit = 3))
+        Assertions.assertEquals("[0, 0, 0, 0, 0, ...]", LazyList.repeat(0).toString(limit = 5))
     }
 
     @Test
@@ -317,6 +331,13 @@ class LazyListTest {
         Assertions.assertEquals(1, of(0).count { it == 0 })
         Assertions.assertEquals(9, of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).count { it > 0 })
         Assertions.assertEquals(1, of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).count { it == 0 })
+    }
+
+    @Test
+    fun cycle() {
+        Assertions.assertTrue(of<Int>().cycle().isEmpty())
+        Assertions.assertFalse(of(1, 2, 3).cycle().isEmpty())
+        Assertions.assertEquals(plOf(1, 2, 3, 1, 2, 3, 1), of(1, 2, 3).cycle().take(7))
     }
 
     @Test
@@ -931,9 +952,9 @@ class LazyListTest {
         Assertions.assertInstanceOf(PersistentList::class.java, of(1, 2, 3).zip(of<Int>()) { a, b -> a + b })
         Assertions.assertInstanceOf(PersistentList::class.java, of(1, 2, 3).zip(of(4, 5, 6)) { a, b -> a + b })
 
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), of<Int>().zip(of<Int>()) { a, b -> a + b })
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), of<Int>().zip(of(4, 5, 6)) { a, b -> a + b })
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), of(1, 2, 3).zip(of<Int>()) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), of<Int>().zip(of<Int>()) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), of<Int>().zip(of(4, 5, 6)) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), of(1, 2, 3).zip(of<Int>()) { a, b -> a + b })
 
         Assertions.assertEquals(plOf(5, 7), of(1, 2).zip(of(4, 5, 6)) { a, b -> a + b })
         Assertions.assertEquals(plOf(5, 7), of(1, 2, 3).zip(of(4, 5)) { a, b -> a + b })

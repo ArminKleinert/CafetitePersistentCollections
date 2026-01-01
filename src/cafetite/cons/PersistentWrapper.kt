@@ -79,6 +79,9 @@ class PersistentWrapper<T> : AbstractPersistentList<T>, RandomAccess {
 
     override fun cleared(): PersistentList<T> = from(listOf())
 
-    override fun toString(): String = commonToString()
+    //override fun toString(): String = commonToString()
     override fun hashCode(): Int = actualList.hashCode()
+
+    override fun equals(other: Any?): Boolean =
+        super.equals(other)
 }

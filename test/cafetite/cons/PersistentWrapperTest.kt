@@ -65,6 +65,8 @@ class PersistentWrapperTest {
     fun testToString() {
         Assertions.assertEquals("[]", of<Int>().toString())
         Assertions.assertEquals("[1, 2, 3]", of(1, 2, 3).toString())
+        Assertions.assertEquals("[1, 2, 3, 4]", of(1, 2, 3, 4).toString(limit=4))
+        Assertions.assertEquals("[1, 2, 3, ...]", of(1, 2, 3, 4).toString(limit=3))
     }
 
     @Test
@@ -317,6 +319,13 @@ class PersistentWrapperTest {
         Assertions.assertEquals(1, of(0).count { it == 0 })
         Assertions.assertEquals(9, of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).count { it > 0 })
         Assertions.assertEquals(1, of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).count { it == 0 })
+    }
+
+    @Test
+    fun cycle() {
+        Assertions.assertTrue(of<Int>().cycle().isEmpty())
+        Assertions.assertFalse(of(1, 2, 3).cycle().isEmpty())
+        Assertions.assertEquals(plOf(1, 2, 3, 1, 2, 3, 1), of(1, 2, 3).cycle().take(7))
     }
 
     @Test
@@ -931,9 +940,9 @@ class PersistentWrapperTest {
         Assertions.assertInstanceOf(PersistentList::class.java, of(1, 2, 3).zip(of<Int>()) { a, b -> a + b })
         Assertions.assertInstanceOf(PersistentList::class.java, of(1, 2, 3).zip(of(4, 5, 6)) { a, b -> a + b })
 
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), of<Int>().zip(of<Int>()) { a, b -> a + b })
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), of<Int>().zip(of(4, 5, 6)) { a, b -> a + b })
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), of(1, 2, 3).zip(of<Int>()) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), of<Int>().zip(of<Int>()) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), of<Int>().zip(of(4, 5, 6)) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), of(1, 2, 3).zip(of<Int>()) { a, b -> a + b })
 
         Assertions.assertEquals(plOf(5, 7), of(1, 2).zip(of(4, 5, 6)) { a, b -> a + b })
         Assertions.assertEquals(plOf(5, 7), of(1, 2, 3).zip(of(4, 5)) { a, b -> a + b })

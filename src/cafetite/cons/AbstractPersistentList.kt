@@ -14,7 +14,8 @@ abstract class AbstractPersistentList<T> : PersistentList<T> {
         buffer.append(prefix)
         var count = 0
         for (element in this) {
-            if (++count > 1) buffer.append(separator)
+            count++
+            if (count > 1) buffer.append(separator)
             if (!(limit < 0 || count <= limit)) break
 
             when (element) {
@@ -30,6 +31,7 @@ abstract class AbstractPersistentList<T> : PersistentList<T> {
     }
 
     override fun toString(): String = commonToString()
+    override fun toString(limit: Int): String = commonToString(limit = limit)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

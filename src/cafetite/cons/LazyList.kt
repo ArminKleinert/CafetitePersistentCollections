@@ -50,6 +50,13 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : AbstractPersistentList<T>() {
         return evaluateStep()!!.isEmpty()
     }
 
+    override fun equals(other: Any?): Boolean =
+        super.equals(other)
+
+    override fun hashCode(): Int {
+        return (fn?.hashCode() ?: 0) xor 0xC0FFEE11u.toInt()
+    }
+
     private fun evaluate(): PersistentList<T> = from(toList())
 
     override fun drop(n: Int): PersistentList<T> = drop(n, this)
@@ -92,9 +99,9 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : AbstractPersistentList<T>() {
         return toString(limit = 10000)
     }
 
-    fun toString(limit: Int = 10000): String {
-        return commonToString(limit = limit)
-    }
+//    fun toString(limit: Int = 10000): String {
+//        return commonToString(limit = limit)
+//    }
 
     companion object {
         fun <T> of(vararg xs: T): LazyList<T> =
@@ -108,6 +115,9 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : AbstractPersistentList<T>() {
 
         fun <T> from(elements: Collection<T>) =
             from(elements.asIterable())
+
+        fun <T> from(elements: Sequence<T>) =
+            lazySeq(elements.iterator())
 
         fun <T, R> map(f: (T) -> R, lst: PersistentList<T>): PersistentList<R> = lazySeq {
             if (lst.isEmpty()) nullCons()
@@ -155,10 +165,9 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : AbstractPersistentList<T>() {
         fun <T> take(n: Int, lst: PersistentList<T>): PersistentList<T> {
             return lazySeq {
                 when {
-                    lst.isEmpty() -> nullCons()
+                    lst.isEmpty() || n <= 0 -> nullCons()
                     n == 1 -> cons(lst.car, nullCons())
-                    n > 0 -> cons(lst.car, take(n - 1, lst.cdr))
-                    else -> nullCons()
+                    else /*n > 0*/ -> cons(lst.car, take(n - 1, lst.cdr))
                 }
             }.evaluate()
         }

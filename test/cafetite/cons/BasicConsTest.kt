@@ -6,12 +6,16 @@ import org.junit.jupiter.api.Test
 class BasicConsTest {
     @Suppress("NOTHING_TO_INLINE")
     private inline fun <T> from(coll: Array<T>) = Cons.from(coll)
+
     @Suppress("NOTHING_TO_INLINE")
     private inline fun <T> from(coll: Iterable<T>) = Cons.from(coll)
+
     @Suppress("NOTHING_TO_INLINE")
     private inline fun <T> from(coll: Collection<T>) = Cons.from(coll)
+
     @Suppress("NOTHING_TO_INLINE")
     private inline fun <T> of(vararg xs: T) = Cons.of(*xs)
+
     @Suppress("NOTHING_TO_INLINE")
     private inline fun <T> plOf(vararg xs: T) = PersistentList.of(*xs)
 
@@ -61,6 +65,8 @@ class BasicConsTest {
     fun testToString() {
         Assertions.assertEquals("[]", nullCons<Int>().toString())
         Assertions.assertEquals("[1, 2, 3]", of(1, 2, 3).toString())
+        Assertions.assertEquals("[1, 2, 3, 4]", of(1, 2, 3, 4).toString(limit = 4))
+        Assertions.assertEquals("[1, 2, 3, ...]", of(1, 2, 3, 4).toString(limit = 3))
     }
 
     @Test
@@ -251,6 +257,7 @@ class BasicConsTest {
     fun asIterable() {
         @Suppress("UNUSED_PARAMETER")
         fun <T> isA(l: List<T>) = 1
+
         @Suppress("UNUSED_PARAMETER")
         fun <T> isA(l: Iterable<T>) = 2
         Assertions.assertEquals(1, isA(nullCons<Int>()))
@@ -312,6 +319,13 @@ class BasicConsTest {
         Assertions.assertEquals(1, of(0).count { it == 0 })
         Assertions.assertEquals(9, of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).count { it > 0 })
         Assertions.assertEquals(1, of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).count { it == 0 })
+    }
+
+    @Test
+    fun cycle() {
+        Assertions.assertTrue(of<Int>().cycle().isEmpty())
+        Assertions.assertFalse(of(1, 2, 3).cycle().isEmpty())
+        Assertions.assertEquals(plOf(1, 2, 3, 1, 2, 3, 1), of(1, 2, 3).cycle().take(7))
     }
 
     @Test
@@ -926,9 +940,9 @@ class BasicConsTest {
         Assertions.assertInstanceOf(PersistentList::class.java, of(1, 2, 3).zip(nullCons<Int>()) { a, b -> a + b })
         Assertions.assertInstanceOf(PersistentList::class.java, of(1, 2, 3).zip(of(4, 5, 6)) { a, b -> a + b })
 
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), nullCons<Int>().zip(nullCons<Int>()) { a, b -> a + b })
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), nullCons<Int>().zip(of(4, 5, 6)) { a, b -> a + b })
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), of(1, 2, 3).zip(nullCons<Int>()) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), nullCons<Int>().zip(nullCons<Int>()) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), nullCons<Int>().zip(of(4, 5, 6)) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), of(1, 2, 3).zip(nullCons<Int>()) { a, b -> a + b })
 
         Assertions.assertEquals(plOf(5, 7), of(1, 2).zip(of(4, 5, 6)) { a, b -> a + b })
         Assertions.assertEquals(plOf(5, 7), of(1, 2, 3).zip(of(4, 5)) { a, b -> a + b })

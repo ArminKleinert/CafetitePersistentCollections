@@ -46,6 +46,8 @@ sealed interface PersistentList<T> : List<T> {
 
     abstract override val size: Int
 
+    fun toString(limit: Int): String
+
     // Haskell style
     fun head(): T = car
 
@@ -70,7 +72,7 @@ sealed interface PersistentList<T> : List<T> {
 
     fun count() = size
 
-    open fun cons(element: T): PersistentList<T> = PersistentListHead(element, this)
+     fun cons(element: T): PersistentList<T> = PersistentListHead(element, this)
 
     fun cons(element1: T, element2: T, vararg rest: T): PersistentList<T> {
         var result = this
@@ -157,7 +159,7 @@ sealed interface PersistentList<T> : List<T> {
     val cddddr: List<T>
         get() = drop(4)
 
-    open fun drop(n: Int): PersistentList<T> {
+     fun drop(n: Int): PersistentList<T> {
         require(n >= 0) { "Requested element count $n is less than zero." }
         var countdown = n
         var rest: PersistentList<T> = this
@@ -170,7 +172,7 @@ sealed interface PersistentList<T> : List<T> {
 
     fun shuffled(random: Random = Random.Default): PersistentList<T>
 
-    open fun asSequence(): Sequence<T> = sequence {
+     fun asSequence(): Sequence<T> = sequence {
         var cell = this@PersistentList
         while (cell.isNotEmpty()) {
             yield(cell.car)
@@ -234,15 +236,15 @@ sealed interface PersistentList<T> : List<T> {
         return true
     }
 
-    open fun asIterable(): Iterable<T> = this
+     fun asIterable(): Iterable<T> = this
 
-    open fun toMutableList(): MutableList<T> = asSequence().toMutableList()
+     fun toMutableList(): MutableList<T> = asSequence().toMutableList()
 
-    open fun toList(): List<T> = Collections.unmodifiableList(toMutableList())
+     fun toList(): List<T> = Collections.unmodifiableList(toMutableList())
 
     fun isSingleton(): Boolean = isNotEmpty() && cdr.isEmpty()
 
-    open fun isLazyType(): Boolean = false
+     fun isLazyType(): Boolean = false
 
     ///////////////////////////////////////////////////////////////////////////////////
 
@@ -252,12 +254,12 @@ sealed interface PersistentList<T> : List<T> {
 
     fun chunked(size: Int): PersistentList<List<T>>
 
-    open fun distinct(): PersistentList<T> =
+     fun distinct(): PersistentList<T> =
         LazyList.distinct(this)
 
-    open fun dropWhile(predicate: (T) -> Boolean): PersistentList<T>
+     fun dropWhile(predicate: (T) -> Boolean): PersistentList<T>
 
-    open fun filter(predicate: (T) -> Boolean): PersistentList<T> =
+     fun filter(predicate: (T) -> Boolean): PersistentList<T> =
         LazyList.filter(predicate, this)
 
     fun filterv(predicate: (T) -> Boolean): PersistentList<T>
@@ -265,30 +267,30 @@ sealed interface PersistentList<T> : List<T> {
     fun filterIndexed(predicate: (index: Int, T) -> Boolean): PersistentList<T> =
         LazyList.filterIndexed(predicate, this)
 
-    open fun filterNot(predicate: (T) -> Boolean): PersistentList<T> =
+     fun filterNot(predicate: (T) -> Boolean): PersistentList<T> =
         LazyList.filterNot(predicate, this)
 
     fun filtervNot(predicate: (T) -> Boolean): PersistentList<T>
 
-    open fun filterNotNull(): PersistentList<T> =
+     fun filterNotNull(): PersistentList<T> =
         LazyList.filterNotNull(this)
 
-    open fun <R> flatMap(transform: (T) -> Iterable<R>): PersistentList<R> =
+     fun <R> flatMap(transform: (T) -> Iterable<R>): PersistentList<R> =
         LazyList.flatMap(transform, this)
 
-    open fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): PersistentList<R> =
+     fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): PersistentList<R> =
         LazyList.flatMapIndexed(transform, this)
 
     fun ifEmpty(defaultValue: () -> PersistentList<T>): PersistentList<T> =
         if (isEmpty()) defaultValue()
         else this
 
-    open fun <R> map(transform: (T) -> R): PersistentList<R> =
+     fun <R> map(transform: (T) -> R): PersistentList<R> =
         LazyList.map(transform, this)
 
     fun <R> mapv(transform: (T) -> R): PersistentList<R>
 
-    open fun <R> mapIndexed(transform: (index: Int, T) -> R): PersistentList<R> =
+     fun <R> mapIndexed(transform: (index: Int, T) -> R): PersistentList<R> =
         //sameTypeFromList(asIterable().mapIndexed(transform))
         LazyList.mapIndexed(transform, this)
 
@@ -341,9 +343,9 @@ sealed interface PersistentList<T> : List<T> {
 
     fun sortedWith(comparator: Comparator<in T>): PersistentList<T>
 
-    open fun take(n: Int): PersistentList<T>
+    fun take(n: Int): PersistentList<T>
 
-    open fun takeWhile(predicate: (T) -> Boolean): PersistentList<T> =
+    fun takeWhile(predicate: (T) -> Boolean): PersistentList<T> =
         LazyList.takeWhile(predicate, this)
 
     fun <R> windowed(
@@ -361,9 +363,9 @@ sealed interface PersistentList<T> : List<T> {
     ): PersistentList<PersistentList<T>> =
         LazyList.windowed(size, this, step, partialWindows)
 
-    open fun withIndex(): PersistentList<IndexedValue<T>>
+    fun withIndex(): PersistentList<IndexedValue<T>>
 
-    open fun <R> zip(other: PersistentList<R>): PersistentList<Pair<T, R>>
+    fun <R> zip(other: PersistentList<R>): PersistentList<Pair<T, R>>
 
     fun <R, V> zip(other: Iterable<R>, transform: (a: T, b: R) -> V): PersistentList<V>
 

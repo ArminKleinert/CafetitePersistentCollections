@@ -20,7 +20,7 @@ object EmptyList : AbstractPersistentList<Any?>() {
         return PersistentWrapper(list)
     }
 
-    override fun toString(): String = commonToString()
+    //override fun toString(): String = commonToString()
     override fun hashCode(): Int {
         return javaClass.hashCode()
     }
@@ -93,7 +93,7 @@ class PersistentListHead<T> : AbstractPersistentList<T> {
 
     override fun isEmpty(): Boolean = false
 
-    override fun toString(): String = commonToString()
+    //override fun toString(): String = commonToString()
 
     override fun hashCode(): Int {
         var result = car?.hashCode() ?: 0

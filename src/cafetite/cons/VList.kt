@@ -289,4 +289,7 @@ class VList<T> private constructor(segment: Segment?, private val offset: Int) :
         result = 31 * result + offset
         return result
     }
+
+    override fun equals(other: Any?): Boolean =
+        super.equals(other)
 }

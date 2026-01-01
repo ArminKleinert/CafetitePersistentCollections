@@ -36,6 +36,8 @@ class ListPairTest {
     @Test
     fun testToString() {
         Assertions.assertEquals("[1, 2, 3]", of(listOf(1, 2), listOf(3)).toString())
+        Assertions.assertEquals("[1, 2, 3, 4]", of(listOf(1, 2), listOf(3, 4)).toString(limit = 4))
+        Assertions.assertEquals("[1, 2, 3, ...]", of(listOf(1, 2), listOf(3, 4)).toString(limit = 3))
     }
 
     @Test
@@ -304,6 +306,13 @@ class ListPairTest {
         Assertions.assertEquals(10, of(listOf(0, 1, 2, 3), listOf(4, 5, 6, 7, 8, 9)).count())
         Assertions.assertEquals(9, of(listOf(0, 1, 2, 3), listOf(4, 5, 6, 7, 8, 9)).count { it > 0 })
         Assertions.assertEquals(1, of(listOf(0, 1, 2, 3), listOf(4, 5, 6, 7, 8, 9)).count { it == 0 })
+        Assertions.assertEquals(0, of(listOf(0, 1, 2, 3), listOf(4, 5, 6, 7, 8, 9)).count { it < 0 })
+    }
+
+    @Test
+    fun cycle() {
+        Assertions.assertFalse(of(listOf(1), listOf(2, 3)).cycle().isEmpty())
+        Assertions.assertEquals(plOf(1, 2, 3, 1, 2, 3, 1), of(listOf(1), listOf(2, 3)).cycle().take(7))
     }
 
     @Test
@@ -953,7 +962,7 @@ class ListPairTest {
         Assertions.assertInstanceOf(
             PersistentList::class.java,
             of(listOf(1), listOf(2, 3)).zip(of(listOf(4), listOf(5, 6))) { a, b -> a + b })
-        Assertions.assertEquals(plOf<Pair<Int, Int>>(), of(listOf(1), listOf(2, 3)).zip(plOf<Int>()) { a, b -> a + b })
+        Assertions.assertEquals(plOf<Int>(), of(listOf(1), listOf(2, 3)).zip(plOf<Int>()) { a, b -> a + b })
 
         Assertions.assertEquals(plOf(5, 7), of(listOf(1), listOf(2)).zip(plOf(4, 5, 6)) { a, b -> a + b })
         Assertions.assertEquals(plOf(5, 7), of(listOf(1), listOf(2, 3)).zip(plOf(4, 5)) { a, b -> a + b })

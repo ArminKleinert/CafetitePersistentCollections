@@ -1,21 +1,13 @@
 package cafetite.set
 
+import cafetite.map.PersistentMap
 import kotlin.math.max
 import kotlin.math.min
 
 class PersistentHashSet<T> : PersistentSet<T> {
     companion object {
-        private fun nextPowerOfTwo(m: Int): Int {
-            var n = m
-            n--
-            n = n or (n shr 1)
-            n = n or (n shr 2)
-            n = n or (n shr 4)
-            n = n or (n shr 8)
-            n = n or (n shr 16)
-            n++
-            return n
-        }
+        private fun nextPowerOfTwo(m: Int): Int =
+            PersistentMap.nextPowerOfTwo(m)
     }
 
     private val nodes: Array<Node<T>?>

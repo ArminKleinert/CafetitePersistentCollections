@@ -41,11 +41,14 @@ class ListPair<T> private constructor(val left: PersistentList<T>, val right: Pe
 
     override fun <R> sameTypeFromList(list: List<R>): PersistentList<R> = PersistentWrapper(list)
 
-    override fun toString(): String = commonToString()
+    //override fun toString(): String = commonToString()
 
     override fun hashCode(): Int {
         var result = left.hashCode()
         result = 31 * result + right.hashCode()
         return result
     }
+
+    override fun equals(other: Any?): Boolean =
+        super.equals(other)
 }
